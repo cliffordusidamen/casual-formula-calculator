@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './App.css'
 import { useQuery } from '@tanstack/react-query'
 import { useFormulaFieldsStore } from './store/formula-fields-store'
@@ -12,7 +12,9 @@ function FormulaCalculator() {
 
     const subFormulaAutocompleteRef = useRef()
     const inputRef = useRef()
+    const formularBox = useRef()
     const [searchTextValue, setSearchTextValue] = useState('')
+    const [calculatedValue, setCalculatedValue] = useState('')
 
 
     const fetchFormulaFunctions = async () => {
@@ -31,6 +33,10 @@ function FormulaCalculator() {
 
         if (subFormulaAutocompleteRef.current) {
             subFormulaAutocompleteRef.current.style.display = 'none';
+        }
+
+        if (inputRef.current) {
+            inputRef.current.focus();
         }
     }
 
@@ -115,6 +121,52 @@ function FormulaCalculator() {
         }
     }
 
+    const calculate = () => {
+        if (inputRef.current) {
+            inputRef.current.value = '';
+        }
+        const result = formulae.reduce((acc, field) => {
+            const operator = field.operatorName || '+';
+            const value = Number(field.value);
+
+            if (isNaN(value)) return acc;
+
+            switch (operator) {
+                case '+':
+                    return acc + value;
+                case '-':
+                    return acc - value;
+                case '*':
+                    return acc * value;
+                case '/':
+                    return acc / value;
+                default:
+                    return acc;
+            }
+        }, 0);
+
+        setCalculatedValue(result)
+
+        console.log('Result:', result);
+        console.log('Starting calculation ', formulae)
+    }
+
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (
+                formularBox.current &&
+                !formularBox.current.contains(event.target)
+                && (!subFormulaAutocompleteRef.current || !subFormulaAutocompleteRef.current.contains(event.target))
+            ) {
+                calculate();
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
     return (
         <>
             <div style={{
@@ -122,16 +174,10 @@ function FormulaCalculator() {
                 display: 'block',
                 position: 'relative',
             }}>
-                <div style={{
-                    width: '100%',
-                    border: '1px solid #ccc',
-                    padding: '4px',
-                    borderRadius: '5px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'flex-start',
-
-                }}>
+                <div
+                    ref={formularBox}
+                    className='formula-box'
+                >
                     <div style={{
                         display: 'flex',
                         alignItems: 'center',
@@ -190,6 +236,12 @@ function FormulaCalculator() {
                         ))}
                     </div>
                 )}
+            </div>
+
+            <div style={{display: 'flex', marginTop: '10px'}}>
+                <div className='calculated-value'>
+                    { calculatedValue }
+                </div>
             </div>
         </>
     )

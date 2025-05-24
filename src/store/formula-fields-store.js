@@ -34,4 +34,8 @@ export const useFormulaFieldsStore = create((set) => ({
 
         return {operator: lastOperator?.value ?? null, value: lastOperand?.value ?? null};
     },
+
+    calculate: () => {
+        
+    }
 }))
