@@ -140,6 +140,7 @@ function FormulaCalculator() {
 
     return (
         <>
+            <div style={{textAlign: 'left'}}>Enter a value and/or select formula:</div>
             <div style={{
                 width: '500px',
                 display: 'block',
@@ -213,11 +214,13 @@ function FormulaCalculator() {
                 )}
             </div>
 
-            <div style={{display: 'flex', marginTop: '10px'}}>
-                <div className='calculated-value'>
-                    { calculatedValue }
+
+                <div style={{display: 'flex', marginTop: '10px'}}>
+                    <div className='calculated-value'>
+                        { calculatedValue }
+                    </div>
                 </div>
-            </div>
+
         </>
     )
 }

@@ -2,7 +2,8 @@ import { create } from 'zustand'
 import { FORMULA_FIELD_TYPES } from '../consts';
 
 export const useFormulaFieldsStore = create((set) => ({
-    formulae: [],
+    formulae: [
+    ],
 
     calculatedValue: '',
 
@@ -35,6 +36,7 @@ export const useFormulaFieldsStore = create((set) => ({
     calculate: () => {
         const { formulae } = useFormulaFieldsStore.getState();
 
+
         const calculatedValue = formulae.reduce((acc, field) => {
             const operator = field.operatorName || '+';
             const value = Number(field.value);
@@ -55,6 +57,6 @@ export const useFormulaFieldsStore = create((set) => ({
             }
         }, 0);
 
-        set((set) => ({calculatedValue}));
+        set({calculatedValue});
     }
 }))
