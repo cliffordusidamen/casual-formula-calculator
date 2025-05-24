@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import './App.css'
 import { useQuery } from '@tanstack/react-query'
 import { useFormulaFieldsStore } from './store/formula-fields-store'
+import { FORMULA_FIELD_TYPES } from './consts';
 
 function FormulaCalculator() {
 
@@ -61,6 +62,31 @@ function FormulaCalculator() {
 
     }
 
+    const handleFormulaInput = (e) => {
+        const value = e.target.value;
+
+        if (/^[\+\-\*\/][a-zA-Z]/.test(value)) {
+            // Value starts with an operator
+            // const operator = value[0];
+            const rest = value.slice(1).trim();
+
+            if (window._showFormulaOptionsTimeout) {
+                clearTimeout(window._showFormulaOptionsTimeout);
+            }
+
+            if (!rest?.length) {
+                return;
+            }
+
+            window._showFormulaOptionsTimeout = setTimeout(() => {
+                showFormulaOptions(rest);
+            }, 200); 
+        }
+        else {
+            hideFormulaOptions()
+        }
+    }
+
     return (
         <>
             <div style={{
@@ -85,7 +111,7 @@ function FormulaCalculator() {
                     }}>
                         {formulae.map((field, idx) => (
                             <div key={idx}>
-                                {field.value}
+                                {field?.label ?? field?.value}
                             </div>
                         ))}
                     </div>
@@ -126,30 +152,7 @@ function FormulaCalculator() {
                                 return;
                             }
                         }}
-                        onChange={e => {
-                            const value = e.target.value;
-
-                            if (/^[\+\-\*\/][a-zA-Z]/.test(value)) {
-                                // Value starts with an operator
-                                // const operator = value[0];
-                                const rest = value.slice(1).trim();
-
-                                if (window._showFormulaOptionsTimeout) {
-                                    clearTimeout(window._showFormulaOptionsTimeout);
-                                }
-
-                                if (!rest?.length) {
-                                    return;
-                                }
-
-                                window._showFormulaOptionsTimeout = setTimeout(() => {
-                                    showFormulaOptions(rest);
-                                }, 200); 
-                            }
-                            else {
-                                hideFormulaOptions()
-                            }
-                        }}
+                        onChange={handleFormulaInput}
                     />
 
                 </div>
@@ -168,7 +171,7 @@ function FormulaCalculator() {
                             borderRadius: '4px',
                             zIndex: 100,
                             padding: '8px',
-                            height: "120px",
+                            height: "240px",
                             overflowY: "scroll",
                         }}
                     >
@@ -176,6 +179,17 @@ function FormulaCalculator() {
                             <div
                                 key={idx}
                                 className='autocomplete-item'
+                                onClick={e => {
+                                    const operatorName = inputRef.current.value[0];
+                                    inputRef.current.value = '';
+                                    push({
+                                        operatorName,
+                                        label: item.name,
+                                        type: FORMULA_FIELD_TYPES.FUNCTION,
+                                        value: item.value
+                                    });
+                                    hideFormulaOptions()
+                                }}
                             >
                                 <div className="name">{item.name}</div>
                                 <div className="category">{item.category}</div>

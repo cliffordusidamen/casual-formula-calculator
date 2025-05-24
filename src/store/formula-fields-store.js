@@ -9,12 +9,12 @@ export const useFormulaFieldsStore = create((set) => ({
         { type: FORMULA_FIELD_TYPES.TEXT, value: '120' },
     ],
 
-    push: ({ operatorName, value}) => {
+    push: ({ operatorName, value, type, label}) => {
         set((state) => ({
             formulae: [
                 ...state.formulae,
                 { type: FORMULA_FIELD_TYPES.OPERATOR, value: operatorName },
-                { type: FORMULA_FIELD_TYPES.TEXT, value: value },
+                { type: type ?? FORMULA_FIELD_TYPES.TEXT, value: value, label: label ?? null },
             ],
         }));
     },
