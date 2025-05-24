@@ -43,6 +43,20 @@
     font-size: 0.9rem;
     color: rgb(95, 95, 95);
 }
+.formula-function .value {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #003366;
+    color: #f3f3f3;
+    border-radius: 999px;
+    padding: 3px 8px;
+    font-size: 0.8rem;
+    margin-left: 6px;
+    min-width: 24px;
+    text-align: center;
+    display: inline-block;
+}
 .formula-function {
     background-color: #e0f2ff;
     color: #003366;

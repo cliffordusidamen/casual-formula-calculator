@@ -7,14 +7,15 @@ import { FORMULA_FIELD_TYPES } from './consts';
 function FormulaCalculator() {
 
     const formulae = useFormulaFieldsStore(state => state.formulae);
+    const calculatedValue = useFormulaFieldsStore(state => state.calculatedValue);
     const push = useFormulaFieldsStore(state => state.push);
     const pop = useFormulaFieldsStore(state => state.pop);
+    const calculate = useFormulaFieldsStore(state => state.calculate);
 
     const subFormulaAutocompleteRef = useRef()
     const inputRef = useRef()
     const formularBox = useRef()
     const [searchTextValue, setSearchTextValue] = useState('')
-    const [calculatedValue, setCalculatedValue] = useState('')
 
 
     const fetchFormulaFunctions = async () => {
@@ -121,36 +122,6 @@ function FormulaCalculator() {
         }
     }
 
-    const calculate = () => {
-        if (inputRef.current) {
-            inputRef.current.value = '';
-        }
-        const result = formulae.reduce((acc, field) => {
-            const operator = field.operatorName || '+';
-            const value = Number(field.value);
-
-            if (isNaN(value)) return acc;
-
-            switch (operator) {
-                case '+':
-                    return acc + value;
-                case '-':
-                    return acc - value;
-                case '*':
-                    return acc * value;
-                case '/':
-                    return acc / value;
-                default:
-                    return acc;
-            }
-        }, 0);
-
-        setCalculatedValue(result)
-
-        console.log('Result:', result);
-        console.log('Starting calculation ', formulae)
-    }
-
     useEffect(() => {
         function handleClickOutside(event) {
             if (
@@ -189,6 +160,10 @@ function FormulaCalculator() {
                                 className={field.type === FORMULA_FIELD_TYPES.FUNCTION ? 'formula-function' : 'formular-text'}
                             >
                                 {field?.label ?? field?.value}
+                                {!!field?.label && !!field?.value && (
+                                    <span className='value'> {field.value}</span>
+                                )}
+
                             </div>
                         ))}
                     </div>

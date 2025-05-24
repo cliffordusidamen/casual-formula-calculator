@@ -9,6 +9,8 @@ export const useFormulaFieldsStore = create((set) => ({
         { type: FORMULA_FIELD_TYPES.TEXT, value: '120' },
     ],
 
+    calculatedValue: '',
+
     push: ({ operatorName, value, type, label}) => {
         set((state) => ({
             formulae: [
@@ -36,6 +38,28 @@ export const useFormulaFieldsStore = create((set) => ({
     },
 
     calculate: () => {
-        
+        const { formulae } = useFormulaFieldsStore.getState();
+
+        const calculatedValue = formulae.reduce((acc, field) => {
+            const operator = field.operatorName || '+';
+            const value = Number(field.value);
+
+            if (isNaN(value)) return acc;
+
+            switch (operator) {
+                case '+':
+                    return acc + value;
+                case '-':
+                    return acc - value;
+                case '*':
+                    return acc * value;
+                case '/':
+                    return acc / value;
+                default:
+                    return acc;
+            }
+        }, 0);
+
+        set((set) => ({calculatedValue}));
     }
 }))
