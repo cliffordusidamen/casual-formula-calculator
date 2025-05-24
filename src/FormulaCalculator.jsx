@@ -1,18 +1,13 @@
 import { useRef, useState } from 'react'
 import './App.css'
 import { useQuery } from '@tanstack/react-query'
+import { FORMULA_FIELD_TYPES } from './consts'
 
 function FormulaCalculator() {
 
     const subFormulaAutocompleteRef = useRef()
     const inputRef = useRef()
     const [searchTextValue, setSearchTextValue] = useState('')
-
-    const FORMULA_FIELD_TYPES = {
-        TEXT: 'text',
-        OPERATOR: 'operator',
-        FUNCTION: 'function',
-    }
 
     const [formula, setFormula] = useState([
         { type: FORMULA_FIELD_TYPES.TEXT, value: 'start_func' },
