@@ -28,14 +28,8 @@ function FormulaCalculator() {
 
 
     const fetchFormulaFunctions = async () => {
-        console.log('Searching API for: ', searchTextValue)
-
         const res = await fetch(`https://652f91320b8d8ddac0b2b62b.mockapi.io/autocomplete?search=${searchTextValue}`)
-        if (!res.ok) throw new Error('Network response was not ok')
-        const data = res.json()
-
-        console.log('Data for autocomplete: ', data)
-        return data
+        return !res.ok ? [] : res.json()
     }
 
     const { data: formulaFunctions, isLoading, error, refetch } = useQuery({
@@ -46,7 +40,10 @@ function FormulaCalculator() {
 
     const hideFormulaOptions = () => {
         setSearchTextValue('');
-        subFormulaAutocompleteRef.current.style.display = 'none';
+
+        if (subFormulaAutocompleteRef.current) {
+            subFormulaAutocompleteRef.current.style.display = 'none';
+        }
     }
 
     const showFormulaOptions = async (searchText) => {
@@ -58,7 +55,11 @@ function FormulaCalculator() {
                 queryFn: () => fetchFormulaFunctions(searchText)
             })
     
-            // Position the autocomplete dropdown below the input
+            if (!formulaFunctions?.length) {
+                hideFormulaOptions()
+                return;
+            }
+            
             if (subFormulaAutocompleteRef.current) {
                 const rect = inputRef.current.getBoundingClientRect();
                 subFormulaAutocompleteRef.current.style.display = 'block';
@@ -67,6 +68,7 @@ function FormulaCalculator() {
                 subFormulaAutocompleteRef.current.style.left = `${rect.left - 40}px`;
                 subFormulaAutocompleteRef.current.style.width = '120px';
             }
+           
         }, 300)
 
     }
@@ -110,6 +112,8 @@ function FormulaCalculator() {
                             background: 'transparent',
                         }}
                         onKeyDown={e => {
+                            const value = e.target.value;
+
                             if (e.key === 'Backspace' && e.target.value === '') {
                                 if (
                                     formula.length > 0 &&
@@ -132,10 +136,27 @@ function FormulaCalculator() {
                                     setFormula([]);
                                     setTimeout(() => { e.target.value = formula[0].value }, 5);
                                 }
+                            } else if (
+                                e.key === 'Enter' &&
+                                /^[\+\-\*\/]\d+$/.test(value)
+                            ) {
+                                // Value is an operator followed by a numeric value
+                                const operator = value[0];
+                                const number = value.slice(1);
+
+                                setFormula([
+                                    ...formula,
+                                    { type: FORMULA_FIELD_TYPES.OPERATOR, value: operator },
+                                    { type: FORMULA_FIELD_TYPES.TEXT, value: number }
+                                ]);
+                                e.target.value = '';
+                                hideFormulaOptions();
+                                return;
                             }
                         }}
                         onChange={e => {
                             const value = e.target.value;
+
                             if (/^[\+\-\*\/][a-zA-Z]/.test(value)) {
                                 // Value starts with an operator
                                 // const operator = value[0];
@@ -151,7 +172,7 @@ function FormulaCalculator() {
 
                                 window._showFormulaOptionsTimeout = setTimeout(() => {
                                     showFormulaOptions(rest);
-                                }, 350); 
+                                }, 200); 
                             }
                             else {
                                 hideFormulaOptions()
@@ -160,40 +181,32 @@ function FormulaCalculator() {
                     />
 
                 </div>
-                <div
-                    ref={subFormulaAutocompleteRef}
-                    style={{
-                        display: 'none',
-                        position: 'absolute',
-                        top: '50px',
-                        left: 0,
-                        width: '120px',
-                        background: '#fff',
-                        border: '1px solid #ccc',
-                        borderRadius: '4px',
-                        zIndex: 100,
-                        padding: '8px',
-                        height: "120px",
-                        overflowY: "scroll",
-                    }}
-                >
-                    {isLoading && 'Loading...'}
-                    {formulaFunctions && Array.isArray(formulaFunctions) && formulaFunctions.length > 0 && (
 
-                            formulaFunctions.map((item, idx) => (
-                                <div key={idx} style={{ padding: '8px', cursor: 'pointer' }}>
-                                    {item.name}
-                                </div>
-                            ))
-
-                    )}
-                    {error && (
-                        <>
-                            Error loading autocomplete
-                            <button onClick={() => refetch()}>Retry</button>
-                        </>
-                    )}
-                </div>
+                {formulaFunctions && Array.isArray(formulaFunctions) && formulaFunctions.length > 0 && (
+                    <div
+                        ref={subFormulaAutocompleteRef}
+                        style={{
+                            display: 'none',
+                            position: 'absolute',
+                            top: '50px',
+                            left: 0,
+                            width: '120px',
+                            background: '#fff',
+                            border: '1px solid #ccc',
+                            borderRadius: '4px',
+                            zIndex: 100,
+                            padding: '8px',
+                            height: "120px",
+                            overflowY: "scroll",
+                        }}
+                    >
+                        {formulaFunctions.map((item, idx) => (
+                            <div key={idx} style={{ padding: '8px', cursor: 'pointer' }}>
+                                {item.name}
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </>
     )
