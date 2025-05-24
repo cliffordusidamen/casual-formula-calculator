@@ -63,8 +63,8 @@ function FormulaCalculator() {
                 const rect = inputRef.current.getBoundingClientRect();
                 subFormulaAutocompleteRef.current.style.display = 'block';
                 subFormulaAutocompleteRef.current.style.position = 'absolute';
-                subFormulaAutocompleteRef.current.style.top = `${rect.bottom + 5}px`;
-                subFormulaAutocompleteRef.current.style.left = `${rect.left}px`;
+                subFormulaAutocompleteRef.current.style.top = `${rect.bottom / 2 + 10}px`;
+                subFormulaAutocompleteRef.current.style.left = `${rect.left - 40}px`;
                 subFormulaAutocompleteRef.current.style.width = '120px';
             }
         }, 300)
@@ -136,7 +136,7 @@ function FormulaCalculator() {
                         }}
                         onChange={e => {
                             const value = e.target.value;
-                            if (/^[\+\-\*\/].+/.test(value)) {
+                            if (/^[\+\-\*\/][a-zA-Z]/.test(value)) {
                                 // Value starts with an operator
                                 // const operator = value[0];
                                 const rest = value.slice(1).trim();
