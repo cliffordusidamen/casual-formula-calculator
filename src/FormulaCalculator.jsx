@@ -2,24 +2,17 @@ import { useRef, useState } from 'react'
 import './App.css'
 import { useQuery } from '@tanstack/react-query'
 import { FORMULA_FIELD_TYPES } from './consts'
+import { useFormulaFieldsStore } from './store/formula-fields-store'
 
 function FormulaCalculator() {
+
+    const formulae = useFormulaFieldsStore(state => state.formulae);
+    const push = useFormulaFieldsStore(state => state.push);
+    const pop = useFormulaFieldsStore(state => state.pop);
 
     const subFormulaAutocompleteRef = useRef()
     const inputRef = useRef()
     const [searchTextValue, setSearchTextValue] = useState('')
-
-    const [formula, setFormula] = useState([
-        { type: FORMULA_FIELD_TYPES.TEXT, value: 'start_func' },
-        { type: FORMULA_FIELD_TYPES.OPERATOR, value: '+' },
-        { type: FORMULA_FIELD_TYPES.TEXT, value: '12' },
-        { type: FORMULA_FIELD_TYPES.OPERATOR, value: '+' },
-        { type: FORMULA_FIELD_TYPES.TEXT, value: 'adm' },
-        { type: FORMULA_FIELD_TYPES.OPERATOR, value: '-' },
-        { type: FORMULA_FIELD_TYPES.TEXT, value: '4' },
-        { type: FORMULA_FIELD_TYPES.OPERATOR, value: '+' },
-        { type: FORMULA_FIELD_TYPES.FUNCTION, value: 'adm' },
-    ])
 
 
     const fetchFormulaFunctions = async () => {
@@ -90,7 +83,7 @@ function FormulaCalculator() {
                         alignItems: 'center',
                         justifyContent: 'flex-start',
                     }}>
-                        {formula.map((field, idx) => (
+                        {formulae.map((field, idx) => (
                             <div key={idx}>
                                 {field.value}
                             </div>
@@ -109,29 +102,16 @@ function FormulaCalculator() {
                         onKeyDown={e => {
                             const value = e.target.value;
 
-                            if (e.key === 'Backspace' && e.target.value === '') {
-                                if (
-                                    formula.length > 0 &&
-                                    formula[formula.length - 1].type === FORMULA_FIELD_TYPES.FUNCTION
-                                ) {
-                                    const lastOperator = formula[formula.length - 2];
-                                    setFormula(formula.slice(0, -2));
-
-                                    /**
-                                     * Use set time out cos setting directly does not seem to work
-                                     */
-                                    setTimeout(() => e.target.value = lastOperator.value, 5);
-                                }
-                                else if (formula.length >= 2) {
-                                    const lastTwoValues = formula.slice(-2).map(f => f.value).join('');
-                                    setFormula(formula.slice(0, -2));
-                                    setTimeout(() => { e.target.value = lastTwoValues }, 5);
-                                }
-                                else if (formula.length === 1) {
-                                    setFormula([]);
-                                    setTimeout(() => { e.target.value = formula[0].value }, 5);
-                                }
-                            } else if (
+                            if (
+                                e.key === 'Backspace'
+                                && e.target.value === ''
+                                && formulae.length > 0
+                            ) {
+                                const { operator, value } = pop()
+                                e.target.value = `${operator || ''}${value || ''}`;
+                            }
+                            
+                            if (
                                 e.key === 'Enter' &&
                                 /^[\+\-\*\/]\d+$/.test(value)
                             ) {
@@ -139,11 +119,8 @@ function FormulaCalculator() {
                                 const operator = value[0];
                                 const number = value.slice(1);
 
-                                setFormula([
-                                    ...formula,
-                                    { type: FORMULA_FIELD_TYPES.OPERATOR, value: operator },
-                                    { type: FORMULA_FIELD_TYPES.TEXT, value: number }
-                                ]);
+                                push({operatorName: operator, value: number });
+
                                 e.target.value = '';
                                 hideFormulaOptions();
                                 return;
