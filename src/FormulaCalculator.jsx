@@ -1,7 +1,6 @@
 import { useRef, useState } from 'react'
 import './App.css'
 import { useQuery } from '@tanstack/react-query'
-import { FORMULA_FIELD_TYPES } from './consts'
 import { useFormulaFieldsStore } from './store/formula-fields-store'
 
 function FormulaCalculator() {
@@ -54,7 +53,8 @@ function FormulaCalculator() {
                 subFormulaAutocompleteRef.current.style.position = 'absolute';
                 subFormulaAutocompleteRef.current.style.top = `${rect.bottom / 2 + 10}px`;
                 subFormulaAutocompleteRef.current.style.left = `${rect.left - 40}px`;
-                subFormulaAutocompleteRef.current.style.width = '120px';
+                const inputWidth = inputRef.current.offsetWidth;
+                subFormulaAutocompleteRef.current.style.width = `${Math.max(inputWidth, 250)}px`;
             }
            
         }, 300)
@@ -173,8 +173,13 @@ function FormulaCalculator() {
                         }}
                     >
                         {formulaFunctions.map((item, idx) => (
-                            <div key={idx} style={{ padding: '8px', cursor: 'pointer' }}>
-                                {item.name}
+                            <div
+                                key={idx}
+                                className='autocomplete-item'
+                            >
+                                <div className="name">{item.name}</div>
+                                <div className="category">{item.category}</div>
+                                
                             </div>
                         ))}
                     </div>

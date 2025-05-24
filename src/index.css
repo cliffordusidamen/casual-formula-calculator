@@ -1,0 +1,21 @@
+.autocomplete-item {
+    text-align: left;
+    padding: 8px;
+    cursor: pointer;
+}
+.autocomplete-item:hover {
+    background-color: #e6ccff;
+    color: #4b006e;
+    border-radius: 6px;
+    text-align: left;
+    padding: '8px';
+}
+
+.autocomplete-item .name {
+    font-size: 1.2rem;
+}
+
+.autocomplete-item .category {
+    font-size: 0.9rem;
+    color: rgb(95, 95, 95);
+}
