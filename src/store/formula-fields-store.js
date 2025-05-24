@@ -2,12 +2,7 @@ import { create } from 'zustand'
 import { FORMULA_FIELD_TYPES } from '../consts';
 
 export const useFormulaFieldsStore = create((set) => ({
-    formulae: [
-        { type: FORMULA_FIELD_TYPES.OPERATOR, value: '+' },
-        { type: FORMULA_FIELD_TYPES.TEXT, value: '13' },
-        { type: FORMULA_FIELD_TYPES.OPERATOR, value: '*' },
-        { type: FORMULA_FIELD_TYPES.TEXT, value: '120' },
-    ],
+    formulae: [],
 
     calculatedValue: '',
 
