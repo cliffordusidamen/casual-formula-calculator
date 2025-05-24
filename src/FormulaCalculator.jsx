@@ -62,6 +62,34 @@ function FormulaCalculator() {
 
     }
 
+    const handleFormularInputKeydown = e => {
+        const value = e.target.value;
+
+        if (
+            e.key === 'Backspace'
+            && e.target.value === ''
+            && formulae.length > 0
+        ) {
+            const { operator, value } = pop()
+            e.target.value = `${operator || ''}${value || ''}`;
+        }
+        
+        if (
+            e.key === 'Enter' &&
+            /^[\+\-\*\/]\d+$/.test(value)
+        ) {
+            // Value is an operator followed by a numeric value
+            const operator = value[0];
+            const number = value.slice(1);
+
+            push({operatorName: operator, value: number });
+
+            e.target.value = '';
+            hideFormulaOptions();
+            return;
+        }
+    };
+
     const handleFormulaInput = (e) => {
         const value = e.target.value;
 
@@ -110,7 +138,10 @@ function FormulaCalculator() {
                         justifyContent: 'flex-start',
                     }}>
                         {formulae.map((field, idx) => (
-                            <div key={idx}>
+                            <div
+                                key={idx}
+                                className={field.type === FORMULA_FIELD_TYPES.FUNCTION ? 'formula-function' : 'formular-text'}
+                            >
                                 {field?.label ?? field?.value}
                             </div>
                         ))}
@@ -125,33 +156,7 @@ function FormulaCalculator() {
                             fontSize: '16px',
                             background: 'transparent',
                         }}
-                        onKeyDown={e => {
-                            const value = e.target.value;
-
-                            if (
-                                e.key === 'Backspace'
-                                && e.target.value === ''
-                                && formulae.length > 0
-                            ) {
-                                const { operator, value } = pop()
-                                e.target.value = `${operator || ''}${value || ''}`;
-                            }
-                            
-                            if (
-                                e.key === 'Enter' &&
-                                /^[\+\-\*\/]\d+$/.test(value)
-                            ) {
-                                // Value is an operator followed by a numeric value
-                                const operator = value[0];
-                                const number = value.slice(1);
-
-                                push({operatorName: operator, value: number });
-
-                                e.target.value = '';
-                                hideFormulaOptions();
-                                return;
-                            }
-                        }}
+                        onKeyDown={handleFormularInputKeydown}
                         onChange={handleFormulaInput}
                     />
 
@@ -160,20 +165,7 @@ function FormulaCalculator() {
                 {formulaFunctions && Array.isArray(formulaFunctions) && formulaFunctions.length > 0 && (
                     <div
                         ref={subFormulaAutocompleteRef}
-                        style={{
-                            display: 'none',
-                            position: 'absolute',
-                            top: '50px',
-                            left: 0,
-                            width: '120px',
-                            background: '#fff',
-                            border: '1px solid #ccc',
-                            borderRadius: '4px',
-                            zIndex: 100,
-                            padding: '8px',
-                            height: "240px",
-                            overflowY: "scroll",
-                        }}
+                        className='autocomplete-box'
                     >
                         {formulaFunctions.map((item, idx) => (
                             <div

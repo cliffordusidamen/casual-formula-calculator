@@ -1,3 +1,17 @@
+.autocomplete-box {
+    display: none;
+    position: absolute;
+    top: 50px;
+    left: 0;
+    width: 120px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    z-index: 100;
+    padding: 8px;
+    height: 240px;
+    overflow-y: scroll;
+}
 .autocomplete-item {
     text-align: left;
     padding: 8px;
@@ -8,7 +22,7 @@
     color: #4b006e;
     border-radius: 6px;
     text-align: left;
-    padding: '8px';
+    padding: 8px;
 }
 
 .autocomplete-item .name {
@@ -18,4 +32,16 @@
 .autocomplete-item .category {
     font-size: 0.9rem;
     color: rgb(95, 95, 95);
+}
+.formula-function {
+    background-color: #e0f2ff;
+    color: #003366;
+    border: 1px solid #c2e3fb;
+    display: inline-block;
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 2px 4px;
+    box-shadow: 0 1px 2px rgba(107, 33, 168, 0.07);
 }
